@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生日快乐</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        .birthday-card {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+        }
+        .birthday-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        h1 {
+            color: #ff6b6b;
+        }
+        .additional-wishes {
+            margin-top: 1rem;
+            color: #ffcc5c;
+            font-size: 1em; /* 与h1标签保持一致 */
+        }
+        .wish-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .wish {
+            position: absolute;
+            white-space: nowrap;
+            opacity: 0;
+            font-weight: bold;
+            animation: wishMove 5s linear forwards; /* 加快动画速度 */
+        }
+        @keyframes wishMove {
+            0% {
+                transform: translate(${getRandomStartX()}vw, ${Math.random() * 100}vh);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(calc(${getRandomEndX()}vw + 100vw), ${Math.random() * 100}vh);
+                opacity: 0;
+            }
+        }
+        .firework {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #ff6b6b;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: fireworkExplode 2s ease-in-out forwards;
+        }
+        @keyframes fireworkExplode {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(5);
+                opacity: 0;
+            }
+        }
+        .firework-particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: #ffcc5c;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFly 2s ease-in-out forwards;
+        }
+        @keyframes particleFly {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(${getRandomOffset()}px, ${getRandomOffset()}px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        .star {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: starTwinkle 3s infinite alternate;
+        }
+        @keyframes starTwinkle {
+            0% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="birthday-card" id="birthdayCard">
+        <h1>亲爱的肖金悦</h1>
+        <div class="additional-wishes">
+            生日快乐，天天开心！
+        </div>
+    </div>
+
+    <div class="wish-container" id="wishContainer">
+        <!-- 动态祝福语将插入到这里 -->
+    </div>
+
+    <script>
+        // 显示卡片动画
+        window.onload = function() {
+            document.getElementById('birthdayCard').classList.add('visible');
+            startWishes();
+        };
+
+        // 添加彩带动画
+        function createConfetti(x, y) {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti');
+            confetti.style.left = `${x}px`;
+            confetti.style.top = `${y}px`;
+            confetti.style.animationDuration = `${Math.random() * 3 + 2}s`; // 2-5秒
+            confetti.style.animationDelay = `-${Math.random()}s`;
+            confetti.style.transformOrigin = 'center';
+            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+            document.body.appendChild(confetti);
+
+            setTimeout(() => {
+                document.body.removeChild(confetti);
+            }, 5000); // 移除彩带元素
+        }
+
+        // 创建多个彩带
+        for (let i = 0; i < 50; i++) {
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            createConfetti(x, y);
+        }
+
+        // 添加烟花动画
+        function createFirework(x, y) {
+            // 创建烟花粒子
+            for (let i = 0; i < 50; i++) {
+                createParticle(x, y);
+            }
+
+            setTimeout(() => {
+                const firework = document.createElement('div');
+                firework.classList.add('firework');
+                firework.style.left = `${x}px`;
+                firework.style.top = `${y}px`;
+                firework.style.backgroundColor = getRandomColor();
+
+                document.body.appendChild(firework);
+
+                setTimeout(() => {
+                    document.body.removeChild(firework);
+                }, 2000); // 移除烟花元素
+            }, 500); // 烟花在粒子后0.5秒爆炸
+        }
+
+        function getRandomColor() {
+            const colors = ['#ff6b6b', '#ffcc5c', '#6a1b9a', '#ffff99'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function createParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.classList.add('firework-particle');
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            particle.style.backgroundColor = getRandomColor();
+            particle.style.transform = `translate(${getRandomOffset()}px, ${getRandomOffset()}px) rotate(${Math.random() * 360}deg)`;
+            particle.style.animationDelay = `${Math.random()}s`;
+
+            document.body.appendChild(particle);
+
+            setTimeout(() => {
+                document.body.removeChild(particle);
+            }, 2000); // 移除粒子元素
+        }
+
+        function getRandomOffset() {
+            return (Math.random() - 0.5) * 100; // 随机偏移范围为-50到50
+        }
+
+        // 创建多个烟花
+        setInterval(() => {
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            createFirework(x, y);
+        }, 1000);
+
+        // 添加星星动画
+        function createStar(x, y) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.left = `${x}px`;
+            star.style.top = `${y}px`;
+
+            document.body.appendChild(star);
+
+            setTimeout(() => {
+                document.body.removeChild(star);
+            }, 10000); // 移除星星元素
+        }
+
+        // 创建多个星星
+        for (let i = 0; i < 100; i++) {
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            createStar(x, y);
+        }
+
+        // 弹幕祝福语
+        function startWishes() {
+            const wishes = [
+                "愿这一年比去年更加美好！",
+                "祝你生日快乐！",
+                "心想事成，万事如意！",
+                "幸福安康，笑口常开！",
+                "每一天都充满阳光！",
+                "美满幸福，岁岁平安！",
+                "生日快乐，天天开心！",
+                "青春永驻，年年进步！",
+                "阖家欢乐，幸福美满！",
+                "梦想成真，勇往直前！",
+                "健康长寿，生活愉快！",
+                "事业顺利，财源滚滚！",
+                "笑容常伴，好运连连！",
+                "家庭和睦，爱情甜蜜！"
+            ];
+
+            shuffleArray(wishes);
+
+            let delay = 0;
+            wishes.forEach((wish, index) => {
+                addWish(wish, delay);
+                if ((index + 1) % 2 === 0) {
+                    delay += 1000; // 每两个祝福语间隔1秒
+                } else {
+                    delay += 500; // 奇数个祝福语间隔0.5秒
+                }
+            });
+
+            // 持续添加新的祝福语
+            setInterval(() => {
+                const randomWish1 = wishes[Math.floor(Math.random() * wishes.length)];
+                const randomWish2 = wishes[Math.floor(Math.random() * wishes.length)];
+                addWish(randomWish1, 0);
+                addWish(randomWish2, 500); // 第二条祝福语延迟0.5秒
+            }, 5000); // 每5秒添加两条新祝福语
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function addWish(text, delay) {
+            const container = document.getElementById('wishContainer');
+            const wishElement = document.createElement('div');
+            wishElement.classList.add('wish');
+            wishElement.textContent = text;
+            wishElement.style.color = getRandomColor();
+            wishElement.style.top = `${Math.random() * 70 + 15}%`; // 随机位置在15%-85%
+
+            container.appendChild(wishElement);
+
+            setTimeout(() => {
+                wishElement.style.opacity = 1;
+            }, delay);
+
+            setTimeout(() => {
+                container.removeChild(wishElement);
+            }, delay + 3000); // 保持3秒后移除
+        }
+
+        function getRandomStartX() {
+            return Math.random() < 0.5 ? -100 : 100; // 左右随机起点
+        }
+
+        function getRandomEndX() {
+            return Math.random() < 0.5 ? -100 : 100; // 左右随机终点
+        }
+    </script>
+</body>
+</html>
